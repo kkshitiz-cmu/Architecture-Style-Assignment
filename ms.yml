@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile-cs
       args:
-        MYSQL_PASSWORD: foo
+        MYSQL_PASSWORD: xiao
     depends_on:
       - mysql
     environment:
@@ -24,7 +24,7 @@ services:
       context: .
       dockerfile: Dockerfile-rs
       args:
-        MYSQL_PASSWORD: foo
+        MYSQL_PASSWORD: xiao 
     depends_on:
       - mysql
     environment:
@@ -57,7 +57,7 @@ services:
       - ./init-db:/docker-entrypoint-initdb.d
       - ms_db:/var/lib/mysql
     environment:
-      "MYSQL_ROOT_PASSWORD": foo
+      "MYSQL_ROOT_PASSWORD": xiao
       "MYSQL_DATABASE": ms_orderinfo
       "MYSQL_HOST": ms_mysql
     expose:

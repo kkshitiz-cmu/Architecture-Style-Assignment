@@ -80,13 +80,15 @@ public class WSClientAPI
 	public String retrieveOrders(String id) throws Exception
 	{
 		// Set up the URL and connect to the node server
-		String url = "http://localhost:3000/api/orders/"+id;
+		//String url = "http://localhost:3000/api/orders/"+id;
+		String url = "http://ws_server:3000/api/orders/"+id;
 		URL obj = new URL(url);
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
 		//Form the request header and instantiate the response code
 		con.setRequestMethod("GET");
 		int responseCode = con.getResponseCode();
+
 
 		//Set up a buffer to read the response from the server
 		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
@@ -115,7 +117,8 @@ public class WSClientAPI
    	public String newOrder(String Date, String FirstName, String LastName, String Address, String Phone) throws Exception
 	{
 		// Set up the URL and connect to the node server		
-		URL url = new URL("http://localhost:3000/api/orders");
+		//URL url = new URL("http://localhost:3000/api/orders");
+		URL url = new URL("http://ws_server:3000/api/orders");
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
 		// The POST parameters
