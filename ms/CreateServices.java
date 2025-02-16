@@ -34,6 +34,9 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
     static final String USER = "root";
     static final String PASS = Configuration.MYSQL_PASSWORD;
 
+    //Create logger class
+    private static final Logger logger = new Logger("CreateServices.log");
+
     // Do nothing constructor
     public CreateServices() throws RemoteException {}
 
@@ -53,15 +56,18 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
 
             String[] boundNames = registry.list();
             System.out.println("Registered services:");
+            logger.log("Registered services:");
             for (String name : boundNames) {
                 System.out.println("\t" + name);
+                logger.log("\t" + name);
             }
             // Bind this object instance to the name RetrieveServices in the rmiregistry 
             // Naming.rebind("//" + Configuration.getRemoteHost() + ":1099/CreateServices", obj); 
 
         } catch (Exception e) {
 
-            System.out.println("CreateServices binding err: " + e.getMessage()); 
+            System.out.println("CreateServices binding err: " + e.getMessage());
+            logger.log("CreateServices binding err: " + e.getMessage()); 
             e.printStackTrace();
         } 
 
@@ -104,6 +110,8 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
 
             stmt.executeUpdate(sql);
 
+            logger.log("New order created: " + sql);
+
             // clean up the environment
 
             stmt.close();
@@ -114,6 +122,7 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
         } catch(Exception e) {
 
             ReturnString = e.toString();
+            logger.log("Error creating order: " + e.getMessage());
         } 
         
         return(ReturnString);
