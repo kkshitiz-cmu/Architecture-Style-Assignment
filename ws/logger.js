@@ -20,7 +20,6 @@ function writeLog(message) {
 
 // Subscribe to 'log' events asynchronously
 eventBus.on("log", (event, status, service, user) => {
-    console.log(`📥 Received log event: ${event}, ${status}, ${service}, ${user}`);
     setImmediate(() => { // Non-blocking execution
         writeLog(event, status, service, user);
     });
