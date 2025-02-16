@@ -20,8 +20,21 @@
 --
 
 DROP TABLE IF EXISTS `orders`;
+DROP TABLE IF EXISTS `users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `users` (
+  `user_id` VARCHAR(10) NOT NULL,
+  `password` VARCHAR(100) DEFAULT NULL,
+  `token` VARCHAR(100) DEFAULT NULL,
+  PRIMARY KEY (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Insert users into the `users` table
+INSERT INTO `users` (`user_id`, `password`) VALUES 
+('user1', 'ChaosMonkey@24'),
+('user2', 'OpenWebMath@77');
+
 CREATE TABLE `orders` (
   `order_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `order_date` date DEFAULT NULL,

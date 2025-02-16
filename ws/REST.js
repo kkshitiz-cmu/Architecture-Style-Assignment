@@ -26,6 +26,7 @@
 ******************************************************************************************************************/
 
 var mysql   = require("mysql");     //Database
+var authenticateToken = require("./auth.js"); // Import the authenticateToken function
 
 function REST_ROUTER(router,connection) {
     var self = this;
@@ -48,8 +49,69 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
     // GET for /orders specifier - returns all orders currently stored in the database
     // req paramdter is the request object
     // res parameter is the response object
-  
-    router.get("/orders",function(req,res){
+
+    // User Login with Token Generation
+    router.post("/login", function (req, res) {
+        const { userId, password } = req.body;
+
+        if (!userId || !password) {
+            return res.send("null");
+        }
+
+        // Check userId and password
+        const query = "SELECT * FROM users WHERE user_id = ? AND password = ?";
+        const values = [userId, password];
+
+        connection.query(query, values, function (err, results) {
+            if (err) {
+                console.log(err);
+                res.send("null");
+                return;
+            }
+
+            if (results.length === 0) {
+                res.send("null");
+                return;
+            }
+
+            // Generate a random token
+            const token = Math.random().toString(36).slice(2, 18); 
+
+            // Store the token in the database
+            var updateQuery = "UPDATE ?? SET ?? = ? WHERE ?? = ?";
+            var updateTable = ["users", "token", token, "user_id", userId];
+            updateQuery = mysql.format(updateQuery, updateTable);
+
+            connection.query(updateQuery, function (err,rows) {
+                if (err) {
+                    console.log(err);
+                    return res.send("null");
+                } else {
+                    return res.send(token);
+                }
+            });
+        });
+    });
+
+    router.post("/logout", function(req,res){
+        authenticateToken(req, res, connection);
+        console.log("Logging the user out..." );
+        const token = req.headers['authorization']; // Get token from request
+        var query = "UPDATE ?? SET ?? = ? WHERE ?? = ?";
+        var updateTable = ["users", "token", null, "token", token];
+        var table = ["users"];
+        query = mysql.format(query,table);
+        connection.query(query,function(err,rows){
+            if(err) {
+                res.json({"Error" : true, "Message" : "Error executing MySQL query"});
+            } else {
+                res.json({"Error" : false, "Message" : "Success", "Orders" : rows});
+            }
+        });
+    });
+
+    router.get("/orders", function(req,res){
+        authenticateToken(req, res, connection);
         console.log("Getting all database entries..." );
         var query = "SELECT * FROM ??";
         var table = ["orders"];
@@ -67,7 +129,8 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
     // req paramdter is the request object
     // res parameter is the response object
      
-    router.get("/orders/:order_id",function(req,res){
+    router.get("/orders/:order_id", function(req,res){
+        authenticateToken(req, res, connection);
         console.log("Getting order ID: ", req.params.order_id );
         var query = "SELECT * FROM ?? WHERE ??=?";
         var table = ["orders","order_id",req.params.order_id];
@@ -85,7 +148,8 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
     // req paramdter is the request object - note to get parameters (eg. stuff afer the '?') you must use req.body.param
     // res parameter is the response object 
   
-    router.post("/orders",function(req,res){
+    router.post("/orders", function(req,res){
+        authenticateToken(req, res, connection);
         //console.log("url:", req.url);
         //console.log("body:", req.body);
         console.log("Adding to orders table ", req.body.order_date,",",req.body.first_name,",",req.body.last_name,",",req.body.address,",",req.body.phone);

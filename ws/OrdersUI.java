@@ -29,6 +29,9 @@ public class OrdersUI
 	public static void main(String args[])
 	{
 		boolean done = false;						// main loop flag
+		String token = null;                        // user's token
+		String userId = null;                       // user's entered ID
+		String password = null;                     // user's entered password
 		boolean error = false;						// error flag
 		char    option;								// Menu choice from user
 		Console c = System.console();				// Press any key
@@ -57,12 +60,56 @@ public class OrdersUI
 			System.out.println( "Select an Option: \n" );
 			System.out.println( "1: Retrieve all orders in the order database." );
 			System.out.println( "2: Retrieve an order by ID." );
-			System.out.println( "3: Add a new order to the order database." );				
+			System.out.println( "3: Add a new order to the order database." );	
+			System.out.println( "4: Login to the System.");			
 			System.out.println( "X: Exit\n" );
 			System.out.print( "\n>>>> " );
 			option = keyboard.next().charAt(0);	
 			keyboard.nextLine();	// Removes data from keyboard buffer. If you don't clear the buffer, you blow 
 									// through the next call to nextLine()
+			
+			//////////// option 4 ////////////
+
+			if ( option == '4' ) 
+			{
+				if (token != null) {
+					System.out.println("You have already logged in and have access to operations.");
+					continue;
+				}
+
+				System.out.println( "Please enter user Id and password \n" );
+				System.out.print( "\n>>>> " );
+
+				System.out.println("Enter userId:");
+				userId = keyboard.nextLine();
+				
+				System.out.println("Enter password:");
+				password = keyboard.nextLine();
+				System.out.println("Logging in...");
+
+				try 
+				{
+					response = api.login(userId, password);
+					System.out.println(response);
+					if (!response.equals("null")) {
+
+						System.out.println("Login Successful");
+						token = response;
+
+					} else {
+
+						System.out.println("Login failed. Please try again.");
+
+					}
+
+				} catch (Exception e) {
+
+					System.out.println("Login failed. Please try again:: " + e);
+
+				}
+
+				continue;
+			}
 
 			//////////// option 1 ////////////
 
@@ -73,7 +120,7 @@ public class OrdersUI
 				System.out.println( "\nRetrieving All Orders::" );
 				try
 				{
-					response = api.retrieveOrders();
+					response = api.retrieveOrders(token);
 					System.out.println(response);
 
 				} catch (Exception e) {
@@ -115,7 +162,7 @@ public class OrdersUI
 
 				try
 				{
-					response = api.retrieveOrders(orderid);
+					response = api.retrieveOrders(orderid, token);
 					System.out.println(response);
 
 				} catch (Exception e) {
@@ -168,7 +215,7 @@ public class OrdersUI
 					try
 					{
 						System.out.println("\nCreating order...");
-						response = api.newOrder(date, first, last, address, phone);
+						response = api.newOrder(date, first, last, address, phone, token);
 						System.out.println(response);
 
 					} catch(Exception e) {
@@ -196,6 +243,18 @@ public class OrdersUI
 				// Here the user is done, so we set the Done flag and halt the system
 
 				done = true;
+				try
+				{
+					System.out.println("\nLogging you out...");
+					api.logout(token);
+					System.out.println(response);
+
+				} catch(Exception e) {
+
+					System.out.println("Request failed:: " + e);
+
+				}
+
 				System.out.println( "\nDone...\n\n" );
 
 			} // if
