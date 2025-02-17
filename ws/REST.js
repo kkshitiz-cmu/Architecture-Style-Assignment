@@ -24,8 +24,9 @@
 * External Dependencies: mysql
 *
 ******************************************************************************************************************/
-
+require("./logger"); // Start logging service
 var mysql   = require("mysql");     //Database
+const eventBus = require("./eventBus"); // Pubsub
 
 function REST_ROUTER(router,connection) {
     var self = this;
@@ -56,8 +57,10 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
         query = mysql.format(query,table);
         connection.query(query,function(err,rows){
             if(err) {
+                eventBus.emit("log", "Error fetching orders", "ERROR", "REST API", req.ip);
                 res.json({"Error" : true, "Message" : "Error executing MySQL query"});
             } else {
+                eventBus.emit("log", `Successfully retrieved ${rows.length} orders`, "SUCCESS", "REST API", req.ip);
                 res.json({"Error" : false, "Message" : "Success", "Orders" : rows});
             }
         });
@@ -74,8 +77,10 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
         query = mysql.format(query,table);
         connection.query(query,function(err,rows){
             if(err) {
+                eventBus.emit("log", "Error fetching order details", "ERROR", "REST API", req.ip);
                 res.json({"Error" : true, "Message" : "Error executing MySQL query"});
             } else {
+                eventBus.emit("log", `Successfully retrieved order details`, "SUCCESS", "REST API", req.ip);
                 res.json({"Error" : false, "Message" : "Success", "Users" : rows});
             }
         });
@@ -94,8 +99,10 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
         query = mysql.format(query,table);
         connection.query(query,function(err,rows){
             if(err) {
+                eventBus.emit("log", "Error creating order", "ERROR", "REST API", req.ip);
                 res.json({"Error" : true, "Message" : "Error executing MySQL query"});
             } else {
+                eventBus.emit("log", `Successfully created order`, "SUCCESS", "REST API", req.ip);
                 res.json({"Error" : false, "Message" : "User Added !"});
             }
         });
