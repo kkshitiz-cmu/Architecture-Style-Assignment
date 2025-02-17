@@ -10,6 +10,9 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
     static final String USER = "root";
     static final String PASS = Configuration.MYSQL_PASSWORD;
 
+    //Create logger class
+    private static final Logger logger = LoggerUtil.getLogger("DeleteServices");
+
     public DeleteServices() throws RemoteException {}
 
     public static void main(String args[]) 
@@ -22,11 +25,14 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
 
             String[] boundNames = registry.list();
             System.out.println("Registered services:");
+            logger.info("Registered services:");
             for (String name : boundNames) {
                 System.out.println("\t" + name);
+                logger.info("\t" + name);
             }
         } catch (Exception e) {
             System.out.println("DeleteServices binding err: " + e.getMessage()); 
+            logger.error("DeleteServices binding err: " + e.getMessage()); 
             e.printStackTrace();
         } 
     }
@@ -48,13 +54,19 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
 
             if(result == 0) {
                 ReturnString = "No order found with ID: " + orderid;
+                logger.info("No order found with ID: " + orderid);
+            }else{
+                logger.info("Order deleted successfully with ID: " + orderid);
             }
+
+
 
             stmt.close();
             conn.close();
 
         } catch(Exception e) {
             ReturnString = e.toString();
+            logger.error("Error deleting order: " + e.getMessage());
         } 
         
         return(ReturnString);

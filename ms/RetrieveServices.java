@@ -57,16 +57,16 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
 
             String[] boundNames = registry.list();
             System.out.println("Registered services:");
-            logger.log("Registered services:");
+            logger.info("Registered services:");
             for (String name : boundNames) {
                 System.out.println("\t" + name);
-                logger.log("\t" + name);
+                logger.info("\t" + name);
             }
 
         } catch (Exception e) {
 
             System.out.println("RetrieveServices binding err: " + e.getMessage()); 
-            logger.log("RetrieveServices binding err: " + e.getMessage()); 
+            logger.error("RetrieveServices binding err: " + e.getMessage()); 
             e.printStackTrace();
         } 
 
@@ -134,7 +134,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
             }
 
             ReturnString = ReturnString +"]";
-            logger.log("Orders retrieved successfully.");
+            logger.info("Orders retrieved successfully.");
 
             //Clean-up environment
 
@@ -147,7 +147,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
         } catch(Exception e) {
 
             ReturnString = e.toString();
-            logger.log("Error retrieving orders: " + e.getMessage());
+            logger.error("Error retrieving orders: " + e.getMessage());
         } 
         
         return(ReturnString);
@@ -216,7 +216,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
             }
 
             ReturnString = ReturnString +"]";
-            logger.log("Order retrieved for ID: " + orderid);
+            logger.info("Order retrieved for ID: " + orderid);
 
             //Clean-up environment
 
@@ -229,7 +229,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
         } catch(Exception e) {
 
             ReturnString = e.toString();
-            logger.log("Error retrieving order for ID: " + orderid + " - " + e.getMessage());
+            logger.error("Error retrieving order for ID: " + orderid + " - " + e.getMessage());
 
         } 
 
