@@ -22,6 +22,7 @@
 import java.rmi.RemoteException; 
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.registry.Registry;
+import java.util.logging.Logger;
 import java.sql.*;
 
 public class CreateServices extends UnicastRemoteObject implements CreateServicesAI
@@ -67,7 +68,7 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
         } catch (Exception e) {
 
             System.out.println("CreateServices binding err: " + e.getMessage());
-            logger.error("CreateServices binding err: " + e.getMessage()); 
+            logger.severe("CreateServices binding err: " + e.getMessage()); 
             e.printStackTrace();
         } 
 
@@ -122,7 +123,7 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
         } catch(Exception e) {
 
             ReturnString = e.toString();
-            logger.error("Error creating order: " + e.getMessage());
+            logger.severe("Error creating order: " + e.getMessage());
         } 
         
         return(ReturnString);

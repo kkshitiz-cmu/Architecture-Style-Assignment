@@ -23,6 +23,7 @@
 import java.rmi.RemoteException; 
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.registry.Registry;
+import java.util.logging.Logger;
 import java.sql.*;
 
 public class RetrieveServices extends UnicastRemoteObject implements RetrieveServicesAI
@@ -66,7 +67,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
         } catch (Exception e) {
 
             System.out.println("RetrieveServices binding err: " + e.getMessage()); 
-            logger.error("RetrieveServices binding err: " + e.getMessage()); 
+            logger.severe("RetrieveServices binding err: " + e.getMessage()); 
             e.printStackTrace();
         } 
 
@@ -147,7 +148,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
         } catch(Exception e) {
 
             ReturnString = e.toString();
-            logger.error("Error retrieving orders: " + e.getMessage());
+            logger.severe("Error retrieving orders: " + e.getMessage());
         } 
         
         return(ReturnString);
@@ -229,7 +230,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
         } catch(Exception e) {
 
             ReturnString = e.toString();
-            logger.error("Error retrieving order for ID: " + orderid + " - " + e.getMessage());
+            logger.severe("Error retrieving order for ID: " + orderid + " - " + e.getMessage());
 
         } 
 

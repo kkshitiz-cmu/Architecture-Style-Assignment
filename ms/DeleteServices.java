@@ -1,6 +1,7 @@
 import java.rmi.RemoteException; 
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.registry.Registry;
+import java.util.logging.Logger;
 import java.sql.*;
 
 public class DeleteServices extends UnicastRemoteObject implements DeleteServicesAI
@@ -32,7 +33,7 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
             }
         } catch (Exception e) {
             System.out.println("DeleteServices binding err: " + e.getMessage()); 
-            logger.error("DeleteServices binding err: " + e.getMessage()); 
+            logger.severe("DeleteServices binding err: " + e.getMessage()); 
             e.printStackTrace();
         } 
     }
@@ -66,7 +67,7 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
 
         } catch(Exception e) {
             ReturnString = e.toString();
-            logger.error("Error deleting order: " + e.getMessage());
+            logger.severe("Error deleting order: " + e.getMessage());
         } 
         
         return(ReturnString);
