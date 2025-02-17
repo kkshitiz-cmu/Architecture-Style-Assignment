@@ -60,56 +60,14 @@ public class OrdersUI
 			System.out.println( "Select an Option: \n" );
 			System.out.println( "1: Retrieve all orders in the order database." );
 			System.out.println( "2: Retrieve an order by ID." );
-			System.out.println( "3: Add a new order to the order database." );	
-			System.out.println( "4: Login to the System.");			
+			System.out.println( "3: Add a new order to the order database." );				
+			System.out.println( "4: Delete an order by ID." );
+			System.out.println( "5: Login to the System.");			
 			System.out.println( "X: Exit\n" );
 			System.out.print( "\n>>>> " );
 			option = keyboard.next().charAt(0);	
 			keyboard.nextLine();	// Removes data from keyboard buffer. If you don't clear the buffer, you blow 
 									// through the next call to nextLine()
-			
-			//////////// option 4 ////////////
-
-			if ( option == '4' ) 
-			{
-				if (token != null) {
-					System.out.println("You have already logged in and have access to operations.");
-					continue;
-				}
-
-				System.out.println( "Please enter user Id and password \n" );
-				System.out.print( "\n>>>> " );
-
-				System.out.println("Enter userId:");
-				userId = keyboard.nextLine();
-				
-				System.out.println("Enter password:");
-				password = keyboard.nextLine();
-				System.out.println("Logging in...");
-
-				try 
-				{
-					response = api.login(userId, password);
-					System.out.println(response);
-					if (!response.equals("null")) {
-
-						System.out.println("Login Successful");
-						token = response;
-
-					} else {
-
-						System.out.println("Login failed. Please try again.");
-
-					}
-
-				} catch (Exception e) {
-
-					System.out.println("Login failed. Please try again:: " + e);
-
-				}
-
-				continue;
-			}
 
 			//////////// option 1 ////////////
 
@@ -235,6 +193,84 @@ public class OrdersUI
 				option = ' '; //Clearing option. This incase the user enterd X/x the program will not exit.
 
 			} // if
+
+			//////////// option 4 ////////////
+
+			if ( option == '4' )
+			{
+				error = true;
+
+				while (error)
+				{
+					System.out.print( "\nEnter the order ID to delete: " );
+					orderid = keyboard.nextLine();
+
+					try
+					{
+						Integer.parseInt(orderid);
+						error = false;
+					} catch (NumberFormatException e) {
+						System.out.println( "Not a number, please try again..." );
+						System.out.println("\nPress enter to continue..." );
+					}
+				}
+
+				try
+				{
+					System.out.println("\nDeleting order...");
+					response = api.deleteOrder(orderid);
+					System.out.println(response);
+
+				} catch (Exception e) {
+					System.out.println("Request failed:: " + e);
+				}
+
+				System.out.println("\nPress enter to continue..." );
+				c.readLine();
+			}
+			
+			//////////// option 5 ////////////
+
+			if ( option == '5' ) 
+			{
+				if (token != null) {
+					System.out.println("You have already logged in and have access to operations.");
+					continue;
+				}
+
+				System.out.println( "Please enter user Id and password \n" );
+				System.out.print( "\n>>>> " );
+
+				System.out.println("Enter userId:");
+				userId = keyboard.nextLine();
+				
+				System.out.println("Enter password:");
+				password = keyboard.nextLine();
+				System.out.println("Logging in...");
+
+				try 
+				{
+					response = api.login(userId, password);
+					System.out.println(response);
+					if (!response.equals("null")) {
+
+						System.out.println("Login Successful");
+						token = response;
+
+					} else {
+
+						System.out.println("Login failed. Please try again.");
+
+					}
+
+				} catch (Exception e) {
+
+					System.out.println("Login failed. Please try again:: " + e);
+
+				}
+
+				continue;
+			}  // if
 
 			//////////// option X ////////////
 

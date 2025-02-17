@@ -165,6 +165,25 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
         });
     });
 
+    //deletes order
+    router.delete("/orders/:order_id", function(req,res){
+        console.log("Deleting order ID: ", req.params.order_id );
+        var query = "DELETE FROM ?? WHERE ??=?";
+        var table = ["orders","order_id",req.params.order_id];
+        query = mysql.format(query,table);
+        connection.query(query,function(err,rows){
+            if(err) {
+                res.json({"Error" : true, "Message" : "Error executing MySQL query"});
+            } else {
+                if(rows.affectedRows > 0) {
+                    res.json({"Error" : false, "Message" : "Order deleted successfully"});
+                } else {
+                    res.json({"Error" : false, "Message" : "No order found with this ID"});
+                }
+            }
+        });
+    });
+
 }
 
 // The next line just makes this module available... think of it as a kind package statement in Java
