@@ -44,6 +44,7 @@ easy to navigate to on the command line. It’s a good idea to give it a nice sh
 - `Dockerfile-wsc` – file: Docker build instructions for the web-services client
 - `Dockerfile-cs` –  file: Docker build instructions for the microservices service: CreateServices
 - `Dockerfile-rs` –  file: Docker build instructions for the microservices service: RetrieveServices
+- `Dockerfile-ds` –  file: Docker build instructions for the microservices service: DeleteServices
 - `Dockerfile-msc` –  file: Docker build instructions for the microservices service
 - `stack-ws.yml`, `stack-ws-mx.yml` – file: Docker compose for building and running the web-services server and database stack. (`-mx` for Apple Silicon Macs.)
 - `stack-ms.yml`, `stack-ms-mx.yml` –  file: Docker compose file for building and running the microservices server and database stack. (`-mx` for Apple Silicon Macs.)
@@ -235,7 +236,11 @@ This will download the necessary base containers and build the microservices con
 ...
  ✔ Service client    Built                                                                                                                                                         1.5s 
  ✔ Service retrieve  Built                                                                                                                                                         1.5s 
- ✔ Service create    Built  
+ ✔ Service create    
+ Built                        
+                              1.5s
+ ✔ Service delete  Built                                                                                                                                                         1.5s 
+ 
 ```
 Or
 ```
@@ -254,11 +259,15 @@ The first time you do this (or have removed the contents of the ms-db folder). T
 ```
 ms_client   | 2: Retrieve an order by ID.
 ms_client   | 3: Add a new order to the order database.
+ms_client   | 4: Delete an order by ID.
 ms_client   | X: Exit
 ms_client   |
 ...
 ms_create   | Registered services:
 ms_create   |   CreateServices
+...
+ms_create   | Registered services:
+ms_create   |   DeleteServices
 ...
 ms_retrieve | Registered services:
 ms_mysql    | Version: '5.7.33'  socket: '/var/run/mysq...
