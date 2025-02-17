@@ -44,7 +44,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
         super();
         try {
             // Get the auth service from registry
-            Registry registry = LocateRegistry.getRegistry("ms_auth", 1096);
+            Registry registry = LocateRegistry.getRegistry("ms_auth", 1097);
             authServices = registry.lookup("AuthServices");
         } catch (Exception e) {
             System.out.println("Error connecting to AuthServices: " + e.getMessage());
