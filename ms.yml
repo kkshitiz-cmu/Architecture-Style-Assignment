@@ -70,12 +70,12 @@ services:
 
   auth:
       image: ms_auth
-      container_name: ms_auths
+      container_name: ms_auth
       build:
         context: .
         dockerfile: Dockerfile-auth
         args:
-          MYSQL_PASSWORD: foo
+          MYSQL_PASSWORD: abc
       depends_on:
         - mysql
       environment:

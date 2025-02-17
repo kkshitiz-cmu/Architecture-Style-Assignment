@@ -65,6 +65,7 @@ public class OrdersUI
 
             try {
                 authToken = api.login(username, password);
+				System.out.println(authToken);
                 if (authToken != null) {
                     System.out.println("\nLogin successful!");
                 } else {
