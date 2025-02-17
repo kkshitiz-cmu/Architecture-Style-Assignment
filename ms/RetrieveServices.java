@@ -36,7 +36,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
     static final String PASS = Configuration.MYSQL_PASSWORD;
 
     //Create logger class
-    private static final Logger logger = new Logger("RetrieveServices.log");
+    private static final Logger logger = LoggerUtil.getLogger("RetrieveServices");
 
     // Do nothing constructor
     public RetrieveServices() throws RemoteException {}

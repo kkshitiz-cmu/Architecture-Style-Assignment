@@ -1,33 +1,24 @@
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.time.LocalDateTime;
+import java.util.logging.*;
 
-public class Logger {
-    private PrintWriter logger;
-    private String logFileName;
-    
-    public Logger(String logFileName) {
-        this.logFileName = logFileName;
-        try {
-            logger = new PrintWriter(new FileWriter(logFileName, true));
-        } catch (IOException e) {
-            System.err.println("Could not initialize logger: " + e.getMessage());
+public class LoggerUtil {
+    public static Logger getLogger(String serviceName) {
+        // Create a logger with the service name
+        Logger logger = Logger.getLogger(serviceName);
+        // Remove any default handlers
+        logger.setUseParentHandlers(false);
+        
+        // Check if handlers have already been added to avoid duplicates
+        if (logger.getHandlers().length == 0) {
+            try {
+                // Create a FileHandler that writes to a file named after the service
+                FileHandler fileHandler = new FileHandler(serviceName + ".log", true);
+                fileHandler.setFormatter(new SimpleFormatter());
+                logger.addHandler(fileHandler);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-    }
-    
-    public void log(String message) {
-        String logMessage = LocalDateTime.now() + " - " + message;
-        System.out.println(logMessage);
-        if (logger != null) {
-            logger.println(logMessage);
-            logger.flush();
-        }
-    }
-    
-    public void close() {
-        if (logger != null) {
-            logger.close();
-        }
+        return logger;
     }
 }

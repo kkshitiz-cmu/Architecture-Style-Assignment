@@ -35,7 +35,7 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
     static final String PASS = Configuration.MYSQL_PASSWORD;
 
     //Create logger class
-    private static final Logger logger = new Logger("CreateServices.log");
+    private static final Logger logger = LoggerUtil.getLogger("CreateServices");
 
     // Do nothing constructor
     public CreateServices() throws RemoteException {}
