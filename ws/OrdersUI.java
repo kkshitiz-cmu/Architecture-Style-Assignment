@@ -218,7 +218,7 @@ public class OrdersUI
 				try
 				{
 					System.out.println("\nDeleting order...");
-					response = api.deleteOrder(orderid);
+					response = api.deleteOrder(orderid, token);
 					System.out.println(response);
 
 				} catch (Exception e) {

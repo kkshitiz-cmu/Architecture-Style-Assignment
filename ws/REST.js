@@ -167,6 +167,8 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
 
     //deletes order
     router.delete("/orders/:order_id", function(req,res){
+        authenticateToken(req, res, connection);
+        
         console.log("Deleting order ID: ", req.params.order_id );
         var query = "DELETE FROM ?? WHERE ??=?";
         var table = ["orders","order_id",req.params.order_id];
