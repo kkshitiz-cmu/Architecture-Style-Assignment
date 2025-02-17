@@ -23,6 +23,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.registry.Registry;
 import java.util.logging.Logger;
+import java.lang.management.ManagementFactory;
 import java.sql.*;
 
 public class CreateServices extends UnicastRemoteObject implements CreateServicesAI
@@ -36,7 +37,7 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
     static final String PASS = Configuration.MYSQL_PASSWORD;
 
     //Create logger class
-    private static final Logger logger = LoggerUtil.getLogger("CreateServices");
+    private static final Logger logger = LoggerUtil.getLogger("CreateServices_"+ManagementFactory.getRuntimeMXBean().getName());
 
     // Do nothing constructor
     public CreateServices() throws RemoteException {}

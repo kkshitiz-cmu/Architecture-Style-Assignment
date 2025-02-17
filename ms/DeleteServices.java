@@ -2,6 +2,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.registry.Registry;
 import java.util.logging.Logger;
+import java.lang.management.ManagementFactory;
 import java.sql.*;
 
 public class DeleteServices extends UnicastRemoteObject implements DeleteServicesAI
@@ -12,7 +13,7 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
     static final String PASS = Configuration.MYSQL_PASSWORD;
 
     //Create logger class
-    private static final Logger logger = LoggerUtil.getLogger("DeleteServices");
+    private static final Logger logger = LoggerUtil.getLogger("DeleteServices_"+ManagementFactory.getRuntimeMXBean().getName());
 
     public DeleteServices() throws RemoteException {}
 
