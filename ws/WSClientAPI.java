@@ -156,4 +156,32 @@ public class WSClientAPI
 		return(response.toString());
 		
     } // newOrder
+
+	/********************************************************************************
+	* Description: Deletes the order from the orderinfo database
+	* Parameters: orderId
+	* Returns: String that contains the status of the delete operation
+	********************************************************************************/
+
+	public String deleteOrder(String id) throws Exception
+	{
+		String url = "http://ws_server:3000/api/orders/"+id;
+		URL obj = new URL(url);
+		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+		con.setRequestMethod("DELETE");
+		
+		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		String inputLine;
+		StringBuffer response = new StringBuffer();
+
+		while ((inputLine = in.readLine()) != null) 
+		{
+			response.append(inputLine);
+		}
+		in.close();
+
+		return(response.toString());
+	} //deleteOrder
+	
 } // WSClientAPI
