@@ -8,6 +8,8 @@ RUN npm -y init
 
 COPY ws/REST.js ws/
 COPY ws/Server.js ws/
+COPY ws/eventBus.js ws/
+COPY ws/logger.js ws/
 COPY ws/auth.js ws/
 COPY ws/config ws/config
 WORKDIR /usr/app/ws

@@ -24,8 +24,9 @@
 * External Dependencies: mysql
 *
 ******************************************************************************************************************/
-
+require("./logger"); // Start logging service
 var mysql   = require("mysql");     //Database
+const eventBus = require("./eventBus"); // Pubsub
 var authenticateToken = require("./auth.js"); // Import the authenticateToken function
 
 function REST_ROUTER(router,connection) {
@@ -55,6 +56,7 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
         const { userId, password } = req.body;
 
         if (!userId || !password) {
+            eventBus.emit("log", "No user ID or password given", "ERROR", "AUTHENTICATION");
             return res.send("null");
         }
 
@@ -64,12 +66,14 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
 
         connection.query(query, values, function (err, results) {
             if (err) {
+                eventBus.emit("log", "Error connecting to database", "ERROR", "AUTHENTICATION", `${err}`);
                 console.log(err);
                 res.send("null");
                 return;
             }
 
             if (results.length === 0) {
+                eventBus.emit("log", "Error authenticating user", "ERROR", "AUTHENTICATION");
                 res.send("null");
                 return;
             }
@@ -84,9 +88,11 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
 
             connection.query(updateQuery, function (err,rows) {
                 if (err) {
+                    eventBus.emit("log", "Error authenticating user", "ERROR", "AUTHENTICATION", `${err}`);
                     console.log(err);
                     return res.send("null");
                 } else {
+                    eventBus.emit("log", "Successfully authenticated user", "SUCCESS", "AUTHENTICATION");
                     return res.send(token);
                 }
             });
@@ -118,8 +124,10 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
         query = mysql.format(query,table);
         connection.query(query,function(err,rows){
             if(err) {
+                eventBus.emit("log", "Error fetching orders", "ERROR", "REST API", req.ip);
                 res.json({"Error" : true, "Message" : "Error executing MySQL query"});
             } else {
+                eventBus.emit("log", `Successfully retrieved ${rows.length} orders`, "SUCCESS", "REST API", req.ip);
                 res.json({"Error" : false, "Message" : "Success", "Orders" : rows});
             }
         });
@@ -137,8 +145,10 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
         query = mysql.format(query,table);
         connection.query(query,function(err,rows){
             if(err) {
+                eventBus.emit("log", "Error fetching order details", "ERROR", "REST API", req.ip);
                 res.json({"Error" : true, "Message" : "Error executing MySQL query"});
             } else {
+                eventBus.emit("log", `Successfully retrieved order details`, "SUCCESS", "REST API", req.ip);
                 res.json({"Error" : false, "Message" : "Success", "Users" : rows});
             }
         });
@@ -158,8 +168,10 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
         query = mysql.format(query,table);
         connection.query(query,function(err,rows){
             if(err) {
+                eventBus.emit("log", "Error creating order", "ERROR", "REST API", req.ip);
                 res.json({"Error" : true, "Message" : "Error executing MySQL query"});
             } else {
+                eventBus.emit("log", `Successfully created order`, "SUCCESS", "REST API", req.ip);
                 res.json({"Error" : false, "Message" : "User Added !"});
             }
         });
@@ -175,11 +187,14 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
         query = mysql.format(query,table);
         connection.query(query,function(err,rows){
             if(err) {
+                eventBus.emit("log", "Error deleting order", "ERROR", "REST API", req.ip);
                 res.json({"Error" : true, "Message" : "Error executing MySQL query"});
             } else {
                 if(rows.affectedRows > 0) {
+                    eventBus.emit("log", "Successfully deleted order", "SUCCESS", "REST API", req.ip);
                     res.json({"Error" : false, "Message" : "Order deleted successfully"});
                 } else {
+                    eventBus.emit("log", "Error deleting order - order not found", "ERROR", "REST API", req.ip);
                     res.json({"Error" : false, "Message" : "No order found with this ID"});
                 }
             }
