@@ -80,7 +80,7 @@ services:
         - mysql
       environment:
         RMI_REMOTE_HOST: ms_auth
-        RMI_REMOTE_PORT: 1097
+        RMI_REMOTE_PORT: 1096
         MYSQL_REMOTE_HOST: ms_mysql
         MYSQL_REMOTE_PORT: 3306
       networks:
