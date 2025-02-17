@@ -8,6 +8,7 @@ RUN npm -y init
 
 COPY ws/REST.js ws/
 COPY ws/Server.js ws/
+COPY ws/auth.js ws/
 COPY ws/config ws/config
 WORKDIR /usr/app/ws
 RUN sed "s/<PASSWORD>/${MYSQL_PASSWORD}/g" > config/mysql.config.json < config/mysql.config.json-tmplt
