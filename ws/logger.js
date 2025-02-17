@@ -2,10 +2,10 @@ const fs = require("fs");
 const path = require("path");
 const eventBus = require("./eventBus");
 
-// Define log file path
-const logFilePath = path.join(__dirname, "server_logs.txt");
+// Audit log file path
+const logFilePath = path.join(__dirname, "audit_logs.txt");
 
-// Function to write logs asynchronously
+// Write logs asynchronously to text file
 function writeLog(message) {
     const timestamp = new Date().toISOString();
     const logMessage = `[${timestamp}] ${message}\n`;
@@ -19,9 +19,9 @@ function writeLog(message) {
 
 
 // Subscribe to 'log' events asynchronously
-eventBus.on("log", (event, status, service, user) => {
-    setImmediate(() => { // Non-blocking execution
-        writeLog(event, status, service, user);
+eventBus.on("log", (event, status, service, message) => {
+    setImmediate(() => {
+        writeLog(event, status, service, message);
     });
 });
 
