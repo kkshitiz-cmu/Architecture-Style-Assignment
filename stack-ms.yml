@@ -68,27 +68,8 @@ services:
     networks:
       - ms
 
-  auth:
-      image: ms_auth
-      container_name: ms_auth
-      build:
-        context: .
-        dockerfile: Dockerfile-auth
-        args:
-          MYSQL_PASSWORD: abc
-      depends_on:
-        - mysql
-      environment:
-        RMI_REMOTE_HOST: ms_auth
-        RMI_REMOTE_PORT: 1097
-        MYSQL_REMOTE_HOST: ms_mysql
-        MYSQL_REMOTE_PORT: 3306
-      networks:
-        - ms
-
   mysql:
-    image: mysql:5
-    platform: linux/amd64
+    image: mysql:5.7
     container_name: ms_mysql
     volumes:
       - ./init-db:/docker-entrypoint-initdb.d
@@ -100,11 +81,10 @@ services:
     expose:
       - 3306
     networks:
-      - ms
+        - ms
 
 networks:
   ms:
 volumes:
   ms_db:
     external: true
-

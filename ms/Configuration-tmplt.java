@@ -62,4 +62,13 @@ public interface Configuration {
 	static String getJDBCConnection() {
 		return "jdbc:mysql://" + getMySqlHost() + ":" + getMySqlPort() + "/ms_orderinfo?autoReconnect=true&useSSL=false";
 	}
+
+	static int getAuthPort() {
+        final String key = "AUTH_SERVICE_PORT";
+        final String port = System.getenv(key);
+
+        if (port == null) throw new IllegalStateException(String.format("env var [%s] is not set", key));
+
+        return Integer.valueOf(port);
+    }
 }

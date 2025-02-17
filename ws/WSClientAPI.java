@@ -33,12 +33,98 @@ import java.nio.charset.StandardCharsets;
 public class WSClientAPI
 {
 	/********************************************************************************
+	* Description: Logs in a user after authenticating them
+	* Parameters: None
+	* Returns: String of the user id which can be used as an authentication token
+	********************************************************************************/
+
+   	public String login(String userId, String password) throws Exception
+	{
+		String url = "http://ws_server:3000/api/login";
+
+		URL obj = new URL(url);
+		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+		//Form the request header and instantiate the response code
+		con.setRequestMethod("POST");
+
+		// The POST parameters
+		String input = "userId="+userId+"&password="+password;
+
+		con.setRequestProperty("Accept-Language", "en-GB,en;q=0.5");
+        con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+        con.setRequestProperty("Content-length", Integer.toString(input.length()));
+        con.setRequestProperty("Content-Language", "en-GB");
+        con.setRequestProperty("charset", "utf-8");
+        con.setUseCaches(false);
+        con.setDoOutput(true);
+
+		// Set up a stream and write the parameters to the server
+		OutputStream os = con.getOutputStream();
+		os.write(input.getBytes());
+		os.flush();
+
+		int responseCode = con.getResponseCode();
+
+		//Set up a buffer to read the response from the server
+		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		String inputLine;
+		StringBuffer response = new StringBuffer();
+
+		while ((inputLine = in.readLine()) != null) 
+		{
+			response.append(inputLine);
+		}
+		in.close();
+
+		return response.toString();
+	}
+
+	/********************************************************************************
+	* Description: Logs the user out of the system when they exit
+	* Parameters: None
+	* Returns: String of the logout response
+	********************************************************************************/
+
+	public String logout(String token) throws Exception
+	{
+		// Set up the URL and connect to the node server
+
+		String url = "http://ws_server:3000/api/logout";
+
+		URL obj = new URL(url);
+		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+		//Form the request header and instantiate the response code
+		con.setRequestMethod("POST");
+		con.setRequestProperty("Authorization", token);
+		int responseCode = con.getResponseCode();
+
+
+		//Set up a buffer to read the response from the server
+		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		String inputLine;
+		StringBuffer response = new StringBuffer();
+
+		//Loop through the input and build the response string.
+		//When done, close the stream.
+		while ((inputLine = in.readLine()) != null) 
+		{
+			response.append(inputLine);
+		}
+		in.close();
+
+		return(response.toString());
+
+	}
+
+	/********************************************************************************
 	* Description: Gets and returns all the orders in the orderinfo database
 	* Parameters: None
 	* Returns: String of all the current orders in the orderinfo database
 	********************************************************************************/
 
-	public String retrieveOrders() throws Exception
+	public String retrieveOrders(String token) throws Exception
 	{
 		// Set up the URL and connect to the node server
 
@@ -49,6 +135,7 @@ public class WSClientAPI
 
 		//Form the request header and instantiate the response code
 		con.setRequestMethod("GET");
+		con.setRequestProperty("Authorization", token);
 		int responseCode = con.getResponseCode();
 
 
@@ -77,16 +164,18 @@ public class WSClientAPI
 	*		   orderinfo database.
 	********************************************************************************/
 
-	public String retrieveOrders(String id) throws Exception
+	public String retrieveOrders(String id, String token) throws Exception
 	{
 		// Set up the URL and connect to the node server
-		String url = "http://localhost:3000/api/orders/"+id;
+		String url = "http://ws_server:3000/api/orders/"+id;
 		URL obj = new URL(url);
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
 		//Form the request header and instantiate the response code
 		con.setRequestMethod("GET");
+		con.setRequestProperty("Authorization", token);
 		int responseCode = con.getResponseCode();
+		System.out.println("here");
 
 		//Set up a buffer to read the response from the server
 		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
@@ -112,10 +201,10 @@ public class WSClientAPI
 	* Returns: String that contains the status of the POST operation
 	********************************************************************************/
 
-   	public String newOrder(String Date, String FirstName, String LastName, String Address, String Phone) throws Exception
+   	public String newOrder(String Date, String FirstName, String LastName, String Address, String Phone, String token) throws Exception
 	{
 		// Set up the URL and connect to the node server		
-		URL url = new URL("http://localhost:3000/api/orders");
+		URL url = new URL("http://ws_server:3000/api/orders");
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
 		// The POST parameters
@@ -123,6 +212,7 @@ public class WSClientAPI
 
 		//Configure the POST connection for the parameters
 		conn.setRequestMethod("POST");
+		conn.setRequestProperty("Authorization", token);
         conn.setRequestProperty("Accept-Language", "en-GB,en;q=0.5");
         conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
         conn.setRequestProperty("Content-length", Integer.toString(input.length()));
@@ -133,6 +223,7 @@ public class WSClientAPI
 
         // Set up a stream and write the parameters to the server
 		OutputStream os = conn.getOutputStream();
+		System.out.println("here");
 		os.write(input.getBytes());
 		os.flush();
 
@@ -163,13 +254,14 @@ public class WSClientAPI
 	* Returns: String that contains the status of the delete operation
 	********************************************************************************/
 
-	public String deleteOrder(String id) throws Exception
+	public String deleteOrder(String id, String token) throws Exception
 	{
 		String url = "http://ws_server:3000/api/orders/"+id;
 		URL obj = new URL(url);
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
 		con.setRequestMethod("DELETE");
+		con.setRequestProperty("Authorization", token);
 		
 		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 		String inputLine;

@@ -2,7 +2,7 @@
     "connectionLimit": 100,
     "host": "ws_mysql",
     "user": "root",
-    "password": "<PASSWORD>",  
+    "password": "abc",  
     "database": "ws_orderinfo",
     "debug":  false 
 }

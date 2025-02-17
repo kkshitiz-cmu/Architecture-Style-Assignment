@@ -3,10 +3,16 @@ import java.rmi.server.UnicastRemoteObject;
 import java.rmi.registry.Registry;
 import java.util.logging.Logger;
 import java.lang.management.ManagementFactory;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.Remote;
 import java.sql.*;
 
 public class DeleteServices extends UnicastRemoteObject implements DeleteServicesAI
 { 
+    
+    // Add AuthServices field
+    private Remote authServices;
+    
     static final String JDBC_CONNECTOR = "com.mysql.jdbc.Driver";  
     static final String DB_URL = Configuration.getJDBCConnection();
     static final String USER = "root";
@@ -14,8 +20,18 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
 
     //Create logger class
     private static final Logger logger = LoggerUtil.getLogger("DeleteServices_"+ManagementFactory.getRuntimeMXBean().getName());
-
-    public DeleteServices() throws RemoteException {}
+    
+    public DeleteServices() throws RemoteException {
+        super();
+        try {
+            // Get the auth service from registry
+            Registry registry = LocateRegistry.getRegistry("ms_auth", 1097);
+            authServices = registry.lookup("AuthServices");
+        } catch (Exception e) {
+            System.out.println("Error connecting to AuthServices: " + e.getMessage());
+            throw new RemoteException("Could not initialize auth services");
+        }
+    }
 
     public static void main(String args[]) 
     { 
@@ -39,11 +55,18 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
         } 
     }
 
-    public String deleteOrder(String orderid) throws RemoteException
+    public String deleteOrder(String orderid, String token, String username) throws RemoteException
     {
         Connection conn = null;
         Statement stmt = null;
         String ReturnString = "Order Deleted Successfully";
+
+        AuthServicesAI auth = (AuthServicesAI) authServices;
+
+        // Validate that the token belongs to this user
+        if (!auth.validateToken(token, username)) {
+            return "Unauthorized: Token does not match user";
+        }
 
         try
         {

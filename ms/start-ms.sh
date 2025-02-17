@@ -1,4 +1,5 @@
 #!/bin/bash
 
 java CreateServices &
-java RetrieveServices
+java RetrieveServices &
+java AuthServices
