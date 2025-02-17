@@ -22,10 +22,14 @@
 import java.rmi.RemoteException; 
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.registry.Registry;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.Remote;
 import java.sql.*;
 
 public class CreateServices extends UnicastRemoteObject implements CreateServicesAI
 { 
+    // Add AuthServices field
+    private Remote authServices;
     // Set up the JDBC driver name and database URL
     static final String JDBC_CONNECTOR = "com.mysql.jdbc.Driver";  
     static final String DB_URL = Configuration.getJDBCConnection();
@@ -34,8 +38,17 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
     static final String USER = "root";
     static final String PASS = Configuration.MYSQL_PASSWORD;
 
-    // Do nothing constructor
-    public CreateServices() throws RemoteException {}
+    public CreateServices() throws RemoteException {
+        super();
+        try {
+            // Get the auth service from registry
+            Registry registry = LocateRegistry.getRegistry("ms_auth", 1097);
+            authServices = registry.lookup("AuthServices");
+        } catch (Exception e) {
+            System.out.println("Error connecting to AuthServices: " + e.getMessage());
+            throw new RemoteException("Could not initialize auth services");
+        }
+    }
 
     // Main service loop
     public static void main(String args[]) 
@@ -72,8 +85,14 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
 
     // This method add the entry into the ms_orderinfo database
 
-    public String newOrder(String idate, String ifirst, String ilast, String iaddress, String iphone) throws RemoteException
+    public String newOrder(String idate, String ifirst, String ilast, String iaddress, String iphone, String itoken, String iusername) throws RemoteException
     {
+        AuthServicesAI auth = (AuthServicesAI) authServices;
+
+        // Validate that the token belongs to this user
+        if (!auth.validateToken(itoken, iusername)) {
+            return "Unauthorized: Token does not match user";
+        }
       	// Local declarations
 
         Connection conn = null;		                 // connection to the orderinfo database

@@ -33,7 +33,9 @@ CREATE TABLE `users` (
 -- Insert users into the `users` table
 INSERT INTO `users` (`user_id`, `password`) VALUES 
 ('user1', 'ChaosMonkey@24'),
-('user2', 'OpenWebMath@77');
+('user2', 'OpenWebMath@77'),
+('Hari', 'badpassword'),
+('Kshitiz', 'betterpassword');
 
 CREATE TABLE `orders` (
   `order_id` int(10) unsigned NOT NULL AUTO_INCREMENT,

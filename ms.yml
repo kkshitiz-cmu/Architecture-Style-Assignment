@@ -47,7 +47,7 @@ services:
       - mysql
     environment:
       RMI_REMOTE_HOST: ms_delete
-      RMI_REMOTE_PORT: 1097
+      RMI_REMOTE_PORT: 1096
       MYSQL_REMOTE_HOST: ms_mysql
       MYSQL_REMOTE_PORT: 3306
     networks:
@@ -67,6 +67,24 @@ services:
       RMI_REMOTE_PORT: 1099
     networks:
       - ms
+
+  auth:
+      image: ms_auth
+      container_name: ms_auth
+      build:
+        context: .
+        dockerfile: Dockerfile-auth
+        args:
+          MYSQL_PASSWORD: abc
+      depends_on:
+        - mysql
+      environment:
+        RMI_REMOTE_HOST: ms_auth
+        RMI_REMOTE_PORT: 1097
+        MYSQL_REMOTE_HOST: ms_mysql
+        MYSQL_REMOTE_PORT: 3306
+      networks:
+        - ms
 
   mysql:
     image: mysql:5
