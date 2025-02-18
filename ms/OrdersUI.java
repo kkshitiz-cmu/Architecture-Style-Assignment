@@ -27,6 +27,8 @@ import java.io.Console;
 
 public class OrdersUI
 {
+	private static String authToken = null;
+
 	public static void main(String args[]) throws Exception
 	{
 		boolean done = false;						// main loop flag
@@ -45,9 +47,33 @@ public class OrdersUI
 		LocalDate localDate = null;					// Date object
 		MSClientAPI api = new MSClientAPI();	// RESTful api object
 
+		String username = null; // Username input
+		String password = null; //Password input
+
 		/////////////////////////////////////////////////////////////////////////////////
 		// Main UI loop
 		/////////////////////////////////////////////////////////////////////////////////
+
+		
+        // Authenticate user before allowing any operations
+        while (authToken == null) {
+            System.out.print("\nUsername: ");
+            username = keyboard.nextLine();
+            
+            System.out.print("Password: ");
+            password = keyboard.nextLine();
+
+            try {
+                authToken = api.login(username, password);
+                if (authToken != null) {
+                    System.out.println("\nLogin successful!");
+                } else {
+                    System.out.println("\nInvalid credentials. Please try again.");
+                }
+            } catch (Exception e) {
+                System.out.println("\nError during login: " + e.getMessage());
+            }
+		}
 
 		while (!done)
 		{	
@@ -58,7 +84,8 @@ public class OrdersUI
 			System.out.println( "Select an Option: \n" );
 			System.out.println( "1: Retrieve all orders in the order database." );
 			System.out.println( "2: Retrieve an order by ID." );
-			System.out.println( "3: Add a new order to the order database." );				
+			System.out.println( "3: Add a new order to the order database." );	
+			System.out.println( "4: Delete an order by ID." );				
 			System.out.println( "X: Exit\n" );
 			System.out.print( "\n>>>> " );
 			option = keyboard.next().charAt(0);	
@@ -74,7 +101,7 @@ public class OrdersUI
 				System.out.println( "\nRetrieving All Orders::" );
 				try
 				{
-					response = api.retrieveOrders();
+					response = api.retrieveOrders(authToken, username);
 					System.out.println(response);
 
 				} catch (Exception e) {
@@ -116,7 +143,7 @@ public class OrdersUI
 
 				try
 				{
-					response = api.retrieveOrders(orderid);
+					response = api.retrieveOrders(orderid, authToken, username);
 					System.out.println(response);
 
 				} catch (Exception e) {
@@ -169,7 +196,7 @@ public class OrdersUI
 					try
 					{
 						System.out.println("\nCreating order...");
-						response = api.newOrder(date, first, last, address, phone);
+						response = api.newOrder(date, first, last, address, phone, authToken, username);
 						System.out.println(response);
 
 					} catch(Exception e) {
@@ -189,6 +216,42 @@ public class OrdersUI
 				option = ' '; //Clearing option. This incase the user enterd X/x the program will not exit.
 
 			} // if
+
+
+			//////////// option 4 ////////////
+
+			if ( option == '4' )
+			{
+				error = true;
+
+				while (error)
+				{
+					System.out.print( "\nEnter the order ID to delete: " );
+					orderid = keyboard.nextLine();
+
+					try
+					{
+						Integer.parseInt(orderid);
+						error = false;
+					} catch (NumberFormatException e) {
+						System.out.println( "Not a number, please try again..." );
+						System.out.println("\nPress enter to continue..." );
+					}
+				}
+
+				try
+				{
+					System.out.println("\nDeleting order...");
+					response = api.deleteOrder(orderid, authToken, username);
+					System.out.println(response);
+
+				} catch (Exception e) {
+					System.out.println("Request failed:: " + e);
+				}
+
+				System.out.println("\nPress enter to continue..." );
+				c.readLine();
+			}  // if
 
 			//////////// option X ////////////
 

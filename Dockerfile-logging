@@ -1,5 +1,5 @@
 from openjdk:16
-ARG MYSQL_PASSWORD
+# ARG MYSQL_PASSWORD
 
 WORKDIR /usr/app
 COPY ms/mysql-connector-java-5.1.45-bin.jar lib/
@@ -9,7 +9,7 @@ COPY ms/Configuration-tmplt.java ./
 RUN sed "s/<PASSWORD>/${MYSQL_PASSWORD}/g" < Configuration-tmplt.java > Configuration.java
 RUN rm Configuration-tmplt.java
 
-COPY ms/LoggingServicesAI.java ms/CreateServices.java ms/CreateServicesAI.java ms/AuthServicesAI.java  ./
+COPY ms/AsyncHandler.java ms/LoggingServices.java ms/LoggingServicesAI.java ./
 RUN javac *.java
 
-CMD java CreateServices
+CMD java LoggingServices

@@ -23,6 +23,11 @@
 import java.rmi.RemoteException; 
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.registry.Registry;
+import java.util.logging.Logger;
+import java.util.logging.Level;
+import java.lang.management.ManagementFactory;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.Remote;
 import java.sql.*;
 
 public class RetrieveServices extends UnicastRemoteObject implements RetrieveServicesAI
@@ -35,8 +40,29 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
     static final String USER = "root";
     static final String PASS = Configuration.MYSQL_PASSWORD;
 
-    // Do nothing constructor
-    public RetrieveServices() throws RemoteException {}
+    // Add AuthServices field
+    private Remote authServices;
+    private Remote loggingServices;
+
+    public RetrieveServices() throws RemoteException {
+        super();
+        try {
+            // Get the auth service from registry
+            Registry registry = LocateRegistry.getRegistry("ms_auth", 1097);
+            authServices = registry.lookup("AuthServices");
+        } catch (Exception e) {
+            System.out.println("Error connecting to AuthServices: " + e.getMessage());
+            throw new RemoteException("Could not initialize auth services");
+        }
+        try {
+            // Look up the centralized logging service.
+            Registry registry = LocateRegistry.getRegistry("ms_logging", 1100);
+            loggingServices =  registry.lookup("LoggingServices");
+        } catch (Exception e) {
+            System.out.println("Error connecting to LoggingServices: " + e.getMessage());
+            throw new RemoteException("Could not initialize logging service");
+        }
+    }
 
     // Main service loop
     public static void main(String args[]) 
@@ -44,6 +70,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
     	// What we do is bind to rmiregistry, in this case localhost, port 1099. This is the default
     	// RMI port. Note that I use rebind rather than bind. This is better as it lets you start
     	// and restart without having to shut down the rmiregistry. 
+        // LoggingServicesAI logger = (LoggingServicesAI) loggingServices;
 
         try 
         { 
@@ -71,7 +98,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
 
     // This method will return all the entries in the orderinfo database
 
-    public String retrieveOrders() throws RemoteException
+    public String retrieveOrders(String itoken, String iusername) throws RemoteException
     {
       	// Local declarations
 
@@ -79,6 +106,15 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
         Statement stmt = null;		// A Statement object is an interface that represents a SQL statement.
         String ReturnString = "[";	// Return string. If everything works you get an ordered pair of data
         							// if not you get an error string
+
+        AuthServicesAI auth = (AuthServicesAI) authServices;
+        LoggingServicesAI logger = (LoggingServicesAI) loggingServices;
+
+        // Validate that the token belongs to this user
+        if (!auth.validateToken(itoken, iusername)) {
+            return "Unauthorized: Token does not match user";
+        }
+
         try
         {
             // Here we load and initialize the JDBC connector. Essentially a static class
@@ -128,6 +164,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
             }
 
             ReturnString = ReturnString +"]";
+            logger.log("RetrieveServices", "Orders retrieved successfully: " + ReturnString, Level.INFO);
 
             //Clean-up environment
 
@@ -140,6 +177,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
         } catch(Exception e) {
 
             ReturnString = e.toString();
+            logger.log("RetrieveServices", "Error retrieving orders: " + e.getMessage(), Level.SEVERE);
         } 
         
         return(ReturnString);
@@ -149,7 +187,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
     // This method will returns the order in the orderinfo database corresponding to the id
     // provided in the argument.
 
-    public String retrieveOrders(String orderid) throws RemoteException
+    public String retrieveOrders(String iorderid, String itoken, String iusername) throws RemoteException
     {
       	// Local declarations
 
@@ -157,6 +195,14 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
         Statement stmt = null;		// A Statement object is an interface that represents a SQL statement.
         String ReturnString = "[";	// Return string. If everything works you get an ordered pair of data
         							// if not you get an error string
+        
+        AuthServicesAI auth = (AuthServicesAI) authServices;
+        LoggingServicesAI logger = (LoggingServicesAI) loggingServices;
+
+        // Validate that the token belongs to this user
+        if (!auth.validateToken(itoken, iusername)) {
+            return "Unauthorized: Token does not match user";
+        }
 
         try
         {
@@ -178,7 +224,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
             stmt = conn.createStatement();
             
             String sql;
-            sql = "SELECT * FROM orders where order_id=" + orderid;
+            sql = "SELECT * FROM orders where order_id=" + iorderid;
             ResultSet rs = stmt.executeQuery(sql);
 
             // Extract data from result set. Note there should only be one for this method.
@@ -208,6 +254,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
             }
 
             ReturnString = ReturnString +"]";
+            logger.log("RetrieveServices", "Order retrieved for ID " + iorderid + " : " + ReturnString, Level.INFO);
 
             //Clean-up environment
 
@@ -220,6 +267,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
         } catch(Exception e) {
 
             ReturnString = e.toString();
+            logger.log("RetrieveServices", "Error retrieving order for ID: " + iorderid + " - " + e.getMessage(), Level.SEVERE);
 
         } 
 

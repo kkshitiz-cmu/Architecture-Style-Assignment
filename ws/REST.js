@@ -24,8 +24,10 @@
 * External Dependencies: mysql
 *
 ******************************************************************************************************************/
-
+require("./logger"); // Start logging service
 var mysql   = require("mysql");     //Database
+const eventBus = require("./eventBus"); // Pubsub
+var authenticateToken = require("./auth.js"); // Import the authenticateToken function
 
 function REST_ROUTER(router,connection) {
     var self = this;
@@ -48,11 +50,65 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
     // GET for /orders specifier - returns all orders currently stored in the database
     // req paramdter is the request object
     // res parameter is the response object
-  
-    router.get("/orders",function(req,res){
-        console.log("Getting all database entries..." );
-        var query = "SELECT * FROM ??";
-        var table = ["orders"];
+
+    // User Login with Token Generation
+    router.post("/login", function (req, res) {
+        const { userId, password } = req.body;
+
+        if (!userId || !password) {
+            eventBus.emit("log", "No user ID or password given", "ERROR", "AUTHENTICATION");
+            return res.send("null");
+        }
+
+        // Check userId and password
+        const query = "SELECT * FROM users WHERE user_id = ? AND password = ?";
+        const values = [userId, password];
+
+        connection.query(query, values, function (err, results) {
+            if (err) {
+                eventBus.emit("log", "Error connecting to database", "ERROR", "AUTHENTICATION", `${err}`);
+                console.log(err);
+                res.send("null");
+                return;
+            }
+
+            if (results.length === 0) {
+                eventBus.emit("log", "Error authenticating user", "ERROR", "AUTHENTICATION");
+                res.send("null");
+                return;
+            }
+
+            // Generate a random token
+            const token = Math.random().toString(36).slice(2, 18); 
+
+            // Store the token in the database
+            var updateQuery = "UPDATE ?? SET ?? = ? WHERE ?? = ?";
+            var updateTable = ["users", "token", token, "user_id", userId];
+            updateQuery = mysql.format(updateQuery, updateTable);
+
+            connection.query(updateQuery, function (err,rows) {
+                if (err) {
+                    eventBus.emit("log", "Error authenticating user", "ERROR", "AUTHENTICATION", `${err}`);
+                    console.log(err);
+                    return res.send("null");
+                } else {
+                    eventBus.emit("log", "Successfully authenticated user", "SUCCESS", "AUTHENTICATION");
+                    return res.send(token);
+                }
+            });
+        });
+    });
+
+    router.post("/logout", function(req,res){
+        if (!authenticateToken(req, res, connection)) {
+            return;
+        }
+
+        console.log("Logging the user out..." );
+        const token = req.headers['authorization']; // Get token from request
+        var query = "UPDATE ?? SET ?? = ? WHERE ?? = ?";
+        var updateTable = ["users", "token", null, "token", token];
+        var table = ["users"];
         query = mysql.format(query,table);
         connection.query(query,function(err,rows){
             if(err) {
@@ -63,19 +119,45 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
         });
     });
 
+    router.get("/orders", function(req,res){
+        if (!authenticateToken(req, res, connection)) {
+            return;
+        }
+
+        console.log("Getting all database entries..." );
+        var query = "SELECT * FROM ??";
+        var table = ["orders"];
+        query = mysql.format(query,table);
+        connection.query(query,function(err,rows){
+            if(err) {
+                eventBus.emit("log", "Error fetching orders", "ERROR", "REST API", req.ip);
+                res.json({"Error" : true, "Message" : "Error executing MySQL query"});
+            } else {
+                eventBus.emit("log", `Successfully retrieved ${rows.length} orders`, "SUCCESS", "REST API", req.ip);
+                res.json({"Error" : false, "Message" : "Success", "Orders" : rows});
+            }
+        });
+    });
+
     // GET for /orders/order id specifier - returns the order for the provided order ID
     // req paramdter is the request object
     // res parameter is the response object
      
-    router.get("/orders/:order_id",function(req,res){
+    router.get("/orders/:order_id", function(req,res){
+        if (!authenticateToken(req, res, connection)) {
+            return;
+        }
+
         console.log("Getting order ID: ", req.params.order_id );
         var query = "SELECT * FROM ?? WHERE ??=?";
         var table = ["orders","order_id",req.params.order_id];
         query = mysql.format(query,table);
         connection.query(query,function(err,rows){
             if(err) {
+                eventBus.emit("log", "Error fetching order details", "ERROR", "REST API", req.ip);
                 res.json({"Error" : true, "Message" : "Error executing MySQL query"});
             } else {
+                eventBus.emit("log", `Successfully retrieved order details`, "SUCCESS", "REST API", req.ip);
                 res.json({"Error" : false, "Message" : "Success", "Users" : rows});
             }
         });
@@ -85,7 +167,11 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
     // req paramdter is the request object - note to get parameters (eg. stuff afer the '?') you must use req.body.param
     // res parameter is the response object 
   
-    router.post("/orders",function(req,res){
+    router.post("/orders", function(req,res){
+        if (!authenticateToken(req, res, connection)) {
+            return;
+        }
+
         //console.log("url:", req.url);
         //console.log("body:", req.body);
         console.log("Adding to orders table ", req.body.order_date,",",req.body.first_name,",",req.body.last_name,",",req.body.address,",",req.body.phone);
@@ -94,9 +180,37 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
         query = mysql.format(query,table);
         connection.query(query,function(err,rows){
             if(err) {
+                eventBus.emit("log", "Error creating order", "ERROR", "REST API", req.ip);
                 res.json({"Error" : true, "Message" : "Error executing MySQL query"});
             } else {
+                eventBus.emit("log", `Successfully created order`, "SUCCESS", "REST API", req.ip);
                 res.json({"Error" : false, "Message" : "User Added !"});
+            }
+        });
+    });
+
+    //deletes order
+    router.delete("/orders/:order_id", function(req,res){
+        if (!authenticateToken(req, res, connection)) {
+            return;
+        }
+        
+        console.log("Deleting order ID: ", req.params.order_id );
+        var query = "DELETE FROM ?? WHERE ??=?";
+        var table = ["orders","order_id",req.params.order_id];
+        query = mysql.format(query,table);
+        connection.query(query,function(err,rows){
+            if(err) {
+                eventBus.emit("log", "Error deleting order", "ERROR", "REST API", req.ip);
+                res.json({"Error" : true, "Message" : "Error executing MySQL query"});
+            } else {
+                if(rows.affectedRows > 0) {
+                    eventBus.emit("log", "Successfully deleted order", "SUCCESS", "REST API", req.ip);
+                    res.json({"Error" : false, "Message" : "Order deleted successfully"});
+                } else {
+                    eventBus.emit("log", "Error deleting order - order not found", "ERROR", "REST API", req.ip);
+                    res.json({"Error" : false, "Message" : "No order found with this ID"});
+                }
             }
         });
     });
