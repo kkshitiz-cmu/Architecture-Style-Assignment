@@ -40,9 +40,6 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
     static final String USER = "root";
     static final String PASS = Configuration.MYSQL_PASSWORD;
 
-    //Create logger class
-    // private static final Logger logger = LoggerUtil.getLogger("RetrieveServices_"+ManagementFactory.getRuntimeMXBean().getName());
-
     // Add AuthServices field
     private Remote authServices;
     private Remote loggingServices;
@@ -84,19 +81,13 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
 
             String[] boundNames = registry.list();
             System.out.println("Registered services:");
-            // logger.info("Registered services:");
-            // logger.log("RetrieveServices", "Registered services:", Level.INFO);
             for (String name : boundNames) {
                 System.out.println("\t" + name);
-                // logger.info("\t" + name);
-                // logger.log("RetrieveServices", "\t" + name, Level.INFO);
             }
 
         } catch (Exception e) {
 
             System.out.println("RetrieveServices binding err: " + e.getMessage()); 
-            // logger.severe("RetrieveServices binding err: " + e.getMessage()); 
-            // logger.log("RetrieveServices", "RetrieveServices binding err: " + e.getMessage(), Level.SEVERE);
             e.printStackTrace();
         } 
 
@@ -173,7 +164,6 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
             }
 
             ReturnString = ReturnString +"]";
-            // logger.info("Orders retrieved successfully: " + ReturnString);
             logger.log("RetrieveServices", "Orders retrieved successfully: " + ReturnString, Level.INFO);
 
             //Clean-up environment
@@ -187,7 +177,6 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
         } catch(Exception e) {
 
             ReturnString = e.toString();
-            // logger.severe("Error retrieving orders: " + e.getMessage());
             logger.log("RetrieveServices", "Error retrieving orders: " + e.getMessage(), Level.SEVERE);
         } 
         
@@ -265,7 +254,6 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
             }
 
             ReturnString = ReturnString +"]";
-            // logger.info("Order retrieved for ID " + iorderid + " : " + ReturnString);
             logger.log("RetrieveServices", "Order retrieved for ID " + iorderid + " : " + ReturnString, Level.INFO);
 
             //Clean-up environment
@@ -279,7 +267,6 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
         } catch(Exception e) {
 
             ReturnString = e.toString();
-            // logger.severe("Error retrieving order for ID: " + iorderid + " - " + e.getMessage());
             logger.log("RetrieveServices", "Error retrieving order for ID: " + iorderid + " - " + e.getMessage(), Level.SEVERE);
 
         } 

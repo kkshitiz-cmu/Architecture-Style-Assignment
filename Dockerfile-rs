@@ -11,7 +11,7 @@ RUN sed "s/<PASSWORD>/${MYSQL_PASSWORD}/g" < Configuration-tmplt.java > Configur
 RUN rm Configuration-tmplt.java
 
 
-COPY  ms/LoggingServicesAI.java ms/LoggerUtil.java ms/RetrieveServices.java ms/RetrieveServicesAI.java ms/AuthServicesAI.java ./
+COPY  ms/LoggingServicesAI.java ms/RetrieveServices.java ms/RetrieveServicesAI.java ms/AuthServicesAI.java ./
 
 RUN javac *.java
 

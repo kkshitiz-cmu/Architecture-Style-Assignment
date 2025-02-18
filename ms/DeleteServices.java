@@ -19,9 +19,6 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
     static final String DB_URL = Configuration.getJDBCConnection();
     static final String USER = "root";
     static final String PASS = Configuration.MYSQL_PASSWORD;
-
-    //Create logger class
-    // private static final Logger logger = LoggerUtil.getLogger("DeleteServices_"+ManagementFactory.getRuntimeMXBean().getName());
     
     public DeleteServices() throws RemoteException {
         super();
@@ -45,7 +42,6 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
 
     public static void main(String args[]) 
     { 
-        // LoggingServicesAI logger = (LoggingServicesAI) loggingServices;
         try 
         { 
             DeleteServices obj = new DeleteServices();
@@ -54,17 +50,11 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
 
             String[] boundNames = registry.list();
             System.out.println("Registered services:");
-            // logger.info("Registered services:");
-            // logger.log("DeleteServices", "Registered services:", Level.INFO);
             for (String name : boundNames) {
                 System.out.println("\t" + name);
-                // logger.info("\t" + name);
-                // logger.log("DeleteServices", "\t" + name, Level.INFO);
             }
         } catch (Exception e) {
             System.out.println("DeleteServices binding err: " + e.getMessage()); 
-            // logger.severe("DeleteServices binding err: " + e.getMessage()); 
-            // logger.log("DeleteServices", "DeleteServices binding err: " + e.getMessage(), Level.SEVERE);
             e.printStackTrace();
         } 
     }
@@ -94,10 +84,8 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
 
             if(result == 0) {
                 ReturnString = "No order found with ID: " + orderid;
-                // logger.info("No order found with ID: " + orderid);
                 logger.log("DeleteServices", "No order found with ID: " + orderid, Level.INFO);
             }else{
-                // logger.info("Order deleted successfully with ID: " + orderid);
                 logger.log("DeleteServices", "Order deleted successfully with ID: " + orderid, Level.INFO);
             }
 
@@ -108,7 +96,6 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
 
         } catch(Exception e) {
             ReturnString = e.toString();
-            // logger.severe("Error deleting order: " + e.getMessage());
             logger.log("DeleteServices", "Error deleting order: " + e.getMessage(), Level.SEVERE);
         } 
         

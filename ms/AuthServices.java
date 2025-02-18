@@ -26,9 +26,6 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
     // Store active tokens: Map<token, username>
     private static final Map<String, String> activeTokens = new ConcurrentHashMap<>();
 
-    //Create logger class
-    // private static final Logger logger = LoggerUtil.getLogger("AuthServices_"+ManagementFactory.getRuntimeMXBean().getName());
-
     // Do nothing constructor
     public AuthServices() throws RemoteException {
         super();
@@ -44,7 +41,6 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
 
     // Main service loop
     public static void main(String args[]) {
-        // LoggingServicesAI logger = (LoggingServicesAI) loggingServices;
         try {
             AuthServices obj = new AuthServices();
             Registry registry = Configuration.createRegistry();
@@ -52,16 +48,10 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
 
             String[] boundNames = registry.list();
             System.out.println("Registered services:");
-            // logger.info("Registered services:");
-            // logger.log("AuthServices", "Registered services:", Level.INFO);
             for (String name : boundNames) {
                 System.out.println("\t" + name);
-                // logger.info("\t" + name);
-                // logger.log("AuthServices", "\t" + name, Level.INFO);
             }
         } catch (Exception e) {
-            // logger.severe("AuthServices binding err:: " + e.getMessage()); 
-            // logger.log("AuthServices", "AuthServices binding err:: " + e.getMessage(), Level.SEVERE);
             System.out.println("AuthServices binding err: " + e.getMessage());
             e.printStackTrace();
         }
@@ -84,7 +74,6 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
             if (rs.next()) {
                 token = generateToken();
                 activeTokens.put(token, username);
-                // logger.info("User " + username + " logged in.");
                 logger.log("AuthService","User " + username + " logged in.",Level.INFO);
             }
 
@@ -93,7 +82,6 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
             conn.close();
         } catch(Exception e) {
             logger.log("AuthService","Error logging in user" + username,Level.SEVERE);
-            // logger.severe("Error logging in user" + username);
             throw new RemoteException(e.toString());
         }
 
@@ -109,7 +97,6 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
         // Check if token exists and belongs to the specified user
         return tokenUsername != null && tokenUsername.equals(username);
         } catch(Exception e) {
-            // logger.severe("Invalid token from user "+ username);
             logger.log("AuthService","Invalid token from user "+ username,Level.SEVERE);
             throw new RemoteException("Invalid token");
         }
