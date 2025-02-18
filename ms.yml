@@ -10,6 +10,7 @@ services:
     depends_on:
       - mysql
       - auth
+      - logging
     environment:
       RMI_REMOTE_HOST: ms_create
       RMI_REMOTE_PORT: 1099
@@ -29,6 +30,7 @@ services:
     depends_on:
       - mysql
       - auth
+      - logging
     environment:
       RMI_REMOTE_HOST: ms_retrieve
       RMI_REMOTE_PORT: 1098
@@ -48,6 +50,7 @@ services:
     depends_on:
       - mysql
       - auth
+      - logging
     environment:
       RMI_REMOTE_HOST: ms_delete
       RMI_REMOTE_PORT: 1096
@@ -83,11 +86,24 @@ services:
           MYSQL_PASSWORD: foo
       depends_on:
         - mysql
+        - logging
       environment:
         RMI_REMOTE_HOST: ms_auth
         RMI_REMOTE_PORT: 1097
         MYSQL_REMOTE_HOST: ms_mysql
         MYSQL_REMOTE_PORT: 3306
+      networks:
+        - ms
+  
+  logging:
+      image: ms_logging
+      container_name: ms_logging
+      build:
+        context: .
+        dockerfile: Dockerfile-logging
+      environment:
+        RMI_REMOTE_HOST: ms_logging
+        RMI_REMOTE_PORT: 1100
       networks:
         - ms
 

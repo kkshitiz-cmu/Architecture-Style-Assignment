@@ -23,6 +23,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.registry.Registry;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import java.lang.management.ManagementFactory;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.Remote;
@@ -32,6 +33,7 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
 { 
     // Add AuthServices field
     private Remote authServices;
+    private Remote loggingServices;
     // Set up the JDBC driver name and database URL
     static final String JDBC_CONNECTOR = "com.mysql.jdbc.Driver";  
     static final String DB_URL = Configuration.getJDBCConnection();
@@ -41,7 +43,7 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
     static final String PASS = Configuration.MYSQL_PASSWORD;
 
     //Create logger class
-    private static final Logger logger = LoggerUtil.getLogger("CreateServices_"+ManagementFactory.getRuntimeMXBean().getName());
+    // private static final Logger logger = LoggerUtil.getLogger("CreateServices_"+ManagementFactory.getRuntimeMXBean().getName());
 
     // Do nothing constructor
     public CreateServices() throws RemoteException {
@@ -51,9 +53,17 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
             Registry registry = LocateRegistry.getRegistry("ms_auth", 1097);
             authServices = registry.lookup("AuthServices");
         } catch (Exception e) {
-            logger.severe("Error connecting to AuthServices: " + e.getMessage()); 
+            // logger.severe("Error connecting to AuthServices: " + e.getMessage()); 
             System.out.println("Error connecting to AuthServices: " + e.getMessage());
             throw new RemoteException("Could not initialize auth services");
+        }
+        try {
+            // Look up the centralized logging service.
+            Registry registry = LocateRegistry.getRegistry("ms_logging", 1100);
+            loggingServices = registry.lookup("LoggingServices");
+        } catch (Exception e) {
+            System.out.println("Error connecting to LoggingServices: " + e.getMessage());
+            throw new RemoteException("Could not initialize logging service");
         }
     }
 
@@ -66,6 +76,7 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
 
         try 
         { 
+            // LoggingServicesAI logger = (LoggingServicesAI) loggingServices;
             CreateServices obj = new CreateServices();
 
             Registry registry = Configuration.createRegistry();
@@ -73,10 +84,12 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
 
             String[] boundNames = registry.list();
             System.out.println("Registered services:");
-            logger.info("Registered services:");
+            // logger.info("Registered services:");
+            // logger.log("CreateServices", "Registered services:", Level.INFO);
             for (String name : boundNames) {
                 System.out.println("\t" + name);
-                logger.info("\t" + name);
+                // logger.info("\t" + name);
+                // logger.log("CreateServices", "\t" + name, Level.INFO);
             }
             // Bind this object instance to the name RetrieveServices in the rmiregistry 
             // Naming.rebind("//" + Configuration.getRemoteHost() + ":1099/CreateServices", obj); 
@@ -84,7 +97,8 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
         } catch (Exception e) {
 
             System.out.println("CreateServices binding err: " + e.getMessage());
-            logger.severe("CreateServices binding err: " + e.getMessage()); 
+            // logger.severe("CreateServices binding err: " + e.getMessage()); 
+            // logger.log("CreateServices", "CreateServices binding err:: " + e.getMessage(), Level.SEVERE);
             e.printStackTrace();
         } 
 
@@ -98,6 +112,7 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
     public String newOrder(String idate, String ifirst, String ilast, String iaddress, String iphone, String itoken, String iusername) throws RemoteException
     {
         AuthServicesAI auth = (AuthServicesAI) authServices;
+        LoggingServicesAI logger = (LoggingServicesAI) loggingServices;
 
         // Validate that the token belongs to this user
         if (!auth.validateToken(itoken, iusername)) {
@@ -133,7 +148,8 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
 
             stmt.executeUpdate(sql);
 
-            logger.info("New order created: " + sql);
+            // logger.info("New order created: " + sql);
+            logger.log("CreateServices", "New order created: " + sql, Level.INFO);
 
             // clean up the environment
 
@@ -145,7 +161,8 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
         } catch(Exception e) {
 
             ReturnString = e.toString();
-            logger.severe("Error creating order: " + e.getMessage());
+            // logger.severe("Error creating order: " + e.getMessage());
+            logger.log("CreateServices", "Error creating order: " + e.getMessage(), Level.SEVERE);
         } 
         
         return(ReturnString);
