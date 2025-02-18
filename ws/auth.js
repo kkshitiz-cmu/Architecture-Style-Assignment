@@ -4,7 +4,8 @@ var mysql   = require("mysql");
 function authenticateToken(req, res, connection) {
     const token = req.headers['authorization']; // Get token from request
     if (!token) {
-        return res.status(403).json({ "Error": true, "Message": "No token provided" });
+        res.status(403).json({ "Error": true, "Message": "No token provided" });
+        return false;
     }
 
     // Query the database to verify the token
@@ -14,15 +15,17 @@ function authenticateToken(req, res, connection) {
 
     connection.query(query, function(err, rows) {
         if (err) {
-            return res.status(500).json({ "Error": true, "Message": "Error executing MySQL query" });
+            res.status(500).json({ "Error": true, "Message": "Error executing MySQL query" });
+            return false;
         }
         if (rows.length === 0) {
-            return res.status(403).json({ "Error": true, "Message": "Invalid token" });
+            res.status(403).json({ "Error": true, "Message": "Invalid token" });
+            return false;
         }
 
         // Token is valid, proceed to next middleware or route handler
         req.user = rows[0];  // Optionally attach user information to the request object
-        return;
+        return true;
     });
 }
 
