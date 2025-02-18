@@ -100,7 +100,10 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
     });
 
     router.post("/logout", function(req,res){
-        authenticateToken(req, res, connection);
+        if (!authenticateToken(req, res, connection)) {
+            return;
+        }
+
         console.log("Logging the user out..." );
         const token = req.headers['authorization']; // Get token from request
         var query = "UPDATE ?? SET ?? = ? WHERE ?? = ?";
@@ -117,7 +120,10 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
     });
 
     router.get("/orders", function(req,res){
-        authenticateToken(req, res, connection);
+        if (!authenticateToken(req, res, connection)) {
+            return;
+        }
+
         console.log("Getting all database entries..." );
         var query = "SELECT * FROM ??";
         var table = ["orders"];
@@ -138,7 +144,10 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
     // res parameter is the response object
      
     router.get("/orders/:order_id", function(req,res){
-        authenticateToken(req, res, connection);
+        if (!authenticateToken(req, res, connection)) {
+            return;
+        }
+
         console.log("Getting order ID: ", req.params.order_id );
         var query = "SELECT * FROM ?? WHERE ??=?";
         var table = ["orders","order_id",req.params.order_id];
@@ -159,7 +168,10 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
     // res parameter is the response object 
   
     router.post("/orders", function(req,res){
-        authenticateToken(req, res, connection);
+        if (!authenticateToken(req, res, connection)) {
+            return;
+        }
+
         //console.log("url:", req.url);
         //console.log("body:", req.body);
         console.log("Adding to orders table ", req.body.order_date,",",req.body.first_name,",",req.body.last_name,",",req.body.address,",",req.body.phone);
@@ -179,7 +191,9 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
 
     //deletes order
     router.delete("/orders/:order_id", function(req,res){
-        authenticateToken(req, res, connection);
+        if (!authenticateToken(req, res, connection)) {
+            return;
+        }
         
         console.log("Deleting order ID: ", req.params.order_id );
         var query = "DELETE FROM ?? WHERE ??=?";
