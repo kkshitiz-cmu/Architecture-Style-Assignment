@@ -6,6 +6,7 @@ import java.sql.*;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 public class AuthServices extends UnicastRemoteObject implements AuthServicesAI {
     // Set up the JDBC driver name and database URL
@@ -20,7 +21,7 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
     private static final Map<String, String> activeTokens = new ConcurrentHashMap<>();
 
     //Create logger class
-    private static final Logger logger = LoggerUtil.getLogger("CreateServices_"+ManagementFactory.getRuntimeMXBean().getName());
+    private static final Logger logger = LoggerUtil.getLogger("AuthServices_"+ManagementFactory.getRuntimeMXBean().getName());
 
     // Do nothing constructor
     public AuthServices() throws RemoteException {}

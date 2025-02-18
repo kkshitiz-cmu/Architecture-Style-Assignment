@@ -247,7 +247,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
             }
 
             ReturnString = ReturnString +"]";
-            logger.info("Order retrieved for ID: " + orderid);
+            logger.info("Order retrieved for ID: " + iorderid);
 
             //Clean-up environment
 
@@ -260,7 +260,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
         } catch(Exception e) {
 
             ReturnString = e.toString();
-            logger.severe("Error retrieving order for ID: " + orderid + " - " + e.getMessage());
+            logger.severe("Error retrieving order for ID: " + iorderid + " - " + e.getMessage());
 
         } 
 
