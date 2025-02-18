@@ -63,7 +63,7 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
             if (rs.next()) {
                 token = generateToken();
                 activeTokens.put(token, username);
-                logger.info("User " + username + "logged in.");
+                logger.info("User " + username + " logged in.");
             }
 
             rs.close();

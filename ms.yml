@@ -9,6 +9,7 @@ services:
         MYSQL_PASSWORD: foo
     depends_on:
       - mysql
+      - auth
     environment:
       RMI_REMOTE_HOST: ms_create
       RMI_REMOTE_PORT: 1099
@@ -27,6 +28,7 @@ services:
         MYSQL_PASSWORD: foo
     depends_on:
       - mysql
+      - auth
     environment:
       RMI_REMOTE_HOST: ms_retrieve
       RMI_REMOTE_PORT: 1098
@@ -45,6 +47,7 @@ services:
         MYSQL_PASSWORD: foo
     depends_on:
       - mysql
+      - auth
     environment:
       RMI_REMOTE_HOST: ms_delete
       RMI_REMOTE_PORT: 1096
@@ -61,6 +64,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-msc
+    depends_on:
+      - auth
     command: java OrdersUI
     environment:
       RMI_REMOTE_HOST: ms_server
