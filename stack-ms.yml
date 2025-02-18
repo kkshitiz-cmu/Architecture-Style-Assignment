@@ -42,7 +42,7 @@ services:
       context: .
       dockerfile: Dockerfile-ds
       args:
-        MYSQL_PASSWORD: abc
+        MYSQL_PASSWORD: foo
     depends_on:
       - mysql
     environment:

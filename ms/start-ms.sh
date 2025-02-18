@@ -2,4 +2,5 @@
 
 java CreateServices &
 java RetrieveServices &
-java AuthServices
+java AuthServices &
+java LoggingServices

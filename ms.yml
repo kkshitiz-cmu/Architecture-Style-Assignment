@@ -6,9 +6,11 @@ services:
       context: .
       dockerfile: Dockerfile-cs
       args:
-        MYSQL_PASSWORD: abc
+        MYSQL_PASSWORD: foo
     depends_on:
       - mysql
+      - auth
+      - logging
     environment:
       RMI_REMOTE_HOST: ms_create
       RMI_REMOTE_PORT: 1099
@@ -24,9 +26,11 @@ services:
       context: .
       dockerfile: Dockerfile-rs
       args:
-        MYSQL_PASSWORD: abc
+        MYSQL_PASSWORD: foo
     depends_on:
       - mysql
+      - auth
+      - logging
     environment:
       RMI_REMOTE_HOST: ms_retrieve
       RMI_REMOTE_PORT: 1098
@@ -42,9 +46,11 @@ services:
       context: .
       dockerfile: Dockerfile-ds
       args:
-        MYSQL_PASSWORD: abc
+        MYSQL_PASSWORD: foo
     depends_on:
       - mysql
+      - auth
+      - logging
     environment:
       RMI_REMOTE_HOST: ms_delete
       RMI_REMOTE_PORT: 1096
@@ -61,6 +67,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-msc
+    depends_on:
+      - auth
     command: java OrdersUI
     environment:
       RMI_REMOTE_HOST: ms_server
@@ -75,14 +83,27 @@ services:
         context: .
         dockerfile: Dockerfile-auth
         args:
-          MYSQL_PASSWORD: abc
+          MYSQL_PASSWORD: foo
       depends_on:
         - mysql
+        - logging
       environment:
         RMI_REMOTE_HOST: ms_auth
         RMI_REMOTE_PORT: 1097
         MYSQL_REMOTE_HOST: ms_mysql
         MYSQL_REMOTE_PORT: 3306
+      networks:
+        - ms
+  
+  logging:
+      image: ms_logging
+      container_name: ms_logging
+      build:
+        context: .
+        dockerfile: Dockerfile-logging
+      environment:
+        RMI_REMOTE_HOST: ms_logging
+        RMI_REMOTE_PORT: 1100
       networks:
         - ms
 
@@ -94,7 +115,7 @@ services:
       - ./init-db:/docker-entrypoint-initdb.d
       - ms_db:/var/lib/mysql
     environment:
-      "MYSQL_ROOT_PASSWORD": abc
+      "MYSQL_ROOT_PASSWORD": foo
       "MYSQL_DATABASE": ms_orderinfo
       "MYSQL_HOST": ms_mysql
     expose:

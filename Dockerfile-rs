@@ -1,3 +1,4 @@
+
 from openjdk:16
 ARG MYSQL_PASSWORD
 
@@ -9,7 +10,9 @@ COPY ms/Configuration-tmplt.java ./
 RUN sed "s/<PASSWORD>/${MYSQL_PASSWORD}/g" < Configuration-tmplt.java > Configuration.java
 RUN rm Configuration-tmplt.java
 
-COPY  ms/RetrieveServices.java ms/RetrieveServicesAI.java ms/AuthServicesAI.java ./
+
+COPY  ms/LoggingServicesAI.java ms/RetrieveServices.java ms/RetrieveServicesAI.java ms/AuthServicesAI.java ./
+
 RUN javac *.java
 
 CMD java RetrieveServices
