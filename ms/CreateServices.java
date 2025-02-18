@@ -51,6 +51,7 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
             Registry registry = LocateRegistry.getRegistry("ms_auth", 1097);
             authServices = registry.lookup("AuthServices");
         } catch (Exception e) {
+            logger.severe("Error connecting to AuthServices: " + e.getMessage()); 
             System.out.println("Error connecting to AuthServices: " + e.getMessage());
             throw new RemoteException("Could not initialize auth services");
         }

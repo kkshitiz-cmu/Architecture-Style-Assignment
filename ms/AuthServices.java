@@ -1,6 +1,7 @@
 import java.rmi.RemoteException; 
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.registry.Registry;
+import java.lang.management.ManagementFactory;
 import java.sql.*;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,6 +19,9 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
     // Store active tokens: Map<token, username>
     private static final Map<String, String> activeTokens = new ConcurrentHashMap<>();
 
+    //Create logger class
+    private static final Logger logger = LoggerUtil.getLogger("CreateServices_"+ManagementFactory.getRuntimeMXBean().getName());
+
     // Do nothing constructor
     public AuthServices() throws RemoteException {}
 
@@ -30,10 +34,13 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
 
             String[] boundNames = registry.list();
             System.out.println("Registered services:");
+            logger.info("Registered services:");
             for (String name : boundNames) {
                 System.out.println("\t" + name);
+                logger.info("\t" + name);
             }
         } catch (Exception e) {
+            logger.severe("AuthServices binding err:: " + e.getMessage()); 
             System.out.println("AuthServices binding err: " + e.getMessage());
             e.printStackTrace();
         }
@@ -78,6 +85,7 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
         // Check if token exists and belongs to the specified user
         return tokenUsername != null && tokenUsername.equals(username);
         } catch(Exception e) {
+            logger.severe("Invalid token from user "+ username);
             throw new RemoteException("Invalid token");
         }
     }
