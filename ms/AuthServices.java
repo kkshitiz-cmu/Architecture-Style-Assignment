@@ -51,28 +51,25 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
         Statement stmt = null;
         String token = null;
 
-        // try {
-        //     Class.forName(JDBC_CONNECTOR);
-        //     conn = DriverManager.getConnection(DB_URL, USER, PASS);
-        //     stmt = conn.createStatement();
+        try {
+            Class.forName(JDBC_CONNECTOR);
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            stmt = conn.createStatement();
             
-        //     String sql = "SELECT * FROM users WHERE user_id='" + username + "' AND password='" + password + "'";
-        //     ResultSet rs = stmt.executeQuery(sql);
+            String sql = "SELECT * FROM users WHERE user_id='" + username + "' AND password='" + password + "'";
+            ResultSet rs = stmt.executeQuery(sql);
 
-        //     if (rs.next()) {
-        //         token = generateToken();
-        //         activeTokens.put(token, username);
-        //     }
+            if (rs.next()) {
+                token = generateToken();
+                activeTokens.put(token, username);
+            }
 
-        //     rs.close();
-        //     stmt.close();
-        //     conn.close();
-        // } catch(Exception e) {
-        //     throw new RemoteException(e.toString());
-        // }
-
-        token = generateToken();
-        activeTokens.put(token, username);
+            rs.close();
+            stmt.close();
+            conn.close();
+        } catch(Exception e) {
+            throw new RemoteException(e.toString());
+        }
 
         return token;
     }
