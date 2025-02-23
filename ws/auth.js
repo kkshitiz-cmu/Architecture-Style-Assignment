@@ -25,8 +25,9 @@ function authenticateToken(req, res, connection) {
 
         // Token is valid, proceed to next middleware or route handler
         req.user = rows[0];  // Optionally attach user information to the request object
-        return true;
     });
+
+    return true;
 }
 
 module.exports = authenticateToken;

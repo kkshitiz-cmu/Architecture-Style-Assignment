@@ -124,7 +124,6 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
             return;
         }
 
-        console.log("Getting all database entries..." );
         var query = "SELECT * FROM ??";
         var table = ["orders"];
         query = mysql.format(query,table);
